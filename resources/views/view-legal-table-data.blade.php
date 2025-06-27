@@ -510,6 +510,49 @@
             font-size: 0.75rem;
         }
     }
+    
+    /* Droppable area highlighting */
+    .highlight-droppable {
+        transition: all 0.3s ease;
+        border: 2px dashed #ccc !important;
+        background-color: rgba(0, 123, 255, 0.05) !important;
+    }
+    
+    .droppable-hover {
+        border: 2px dashed #007bff !important;
+        background-color: rgba(0, 123, 255, 0.1) !important;
+    }
+    
+    /* Smooth transition for popups */
+    .floating-popup {
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    
+    .floating-popup.ui-draggable-dragging {
+        transform: scale(1.02);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    /* Enhanced nested-droppable area */
+    .nested-droppable {
+        min-height: 100px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
+    .floating-popup, .pinned-popup {
+        filter: none !important;
+        opacity: 1 !important;
+        backdrop-filter: none !important;
+        /* Remove any blur or dimming */
+    }
+    .floating-popup:active, .floating-popup:focus, .pinned-popup:active, .pinned-popup:focus {
+        filter: none !important;
+        opacity: 1 !important;
+        backdrop-filter: none !important;
+    }
 </style>
 @endpush
 
@@ -568,8 +611,10 @@
                                 if ($row->section !== null) {
                                     $sectionNum = $row->section;
                                     if (!isset($standaloneData[$title]['sections'][$sectionNum])) {
+                                        // Check if title is the same as the parent title, if so don't duplicate it
+                                        $sectionTitle = ($row->title === $title) ? '' : $row->title;
                                         $standaloneData[$title]['sections'][$sectionNum] = [
-                                            'title' => $row->title,
+                                            'title' => $sectionTitle,
                                             'text_content' => $row->text_content,
                                             'subsections' => [],
                                             'paragraphs' => [],
@@ -633,10 +678,11 @@
                             }
                             
                             if ($row->section !== null && empty($row->division) && empty($row->sub_division)) {
-                                $sectionNum = $row->section;
-                                if (!isset($data[$partNum]['sections'][$sectionNum])) {
+                                $sectionNum = $row->section;                                    if (!isset($data[$partNum]['sections'][$sectionNum])) {
+                                    // Check if title is the same as the parent title, if so don't duplicate it
+                                    $sectionTitle = ($row->title === $part['title']) ? '' : $row->title;
                                     $data[$partNum]['sections'][$sectionNum] = [
-                                        'title' => $row->title,
+                                        'title' => $sectionTitle,
                                         'text_content' => $row->text_content,
                                         'subsections' => [],
                                         'paragraphs' => [],
@@ -711,8 +757,11 @@
                                     if ($row->section !== null) {
                                         $sectionNum = $row->section;
                                         if (!isset($data[$partNum]['divisions'][$divisionNum]['sub_divisions'][$subDivisionNum]['sections'][$sectionNum])) {
+                                            // Prevent duplicating the parent title
+                                            $parentTitle = $data[$partNum]['divisions'][$divisionNum]['sub_divisions'][$subDivisionNum]['title'] ?? '';
+                                            $sectionTitle = ($row->title === $parentTitle) ? '' : $row->title;
                                             $data[$partNum]['divisions'][$divisionNum]['sub_divisions'][$subDivisionNum]['sections'][$sectionNum] = [
-                                                'title' => $row->title,
+                                                'title' => $sectionTitle,
                                                 'text_content' => $row->text_content,
                                                 'subsections' => [],
                                                 'paragraphs' => [],
@@ -806,8 +855,7 @@
                         @foreach($standaloneData as $titleGroup => $group)
                             <div style="margin-bottom: 1.5em;">
                                 <div style="font-size:1.15em; font-weight:bold; margin-bottom:0.5em;">{{ $titleGroup }}</div>
-                                @foreach($group['sections'] as $sectionNumber => $section)
-                                    @if(!empty($section['title']) && !isset($section['is_intro']))
+                                @foreach($group['sections'] as $sectionNumber => $section)                                        @if(!empty($section['title']) && trim($section['title']) !== '' && !isset($section['is_intro']) && $section['title'] !== $titleGroup)
                                         <div style="margin-top: 1em; color: #333; font-weight: bold;">{{ $section['title'] }}</div>
                                     @endif
                                     @if(!empty($section['text_content']))
@@ -822,18 +870,18 @@
                                         <div style="margin-left: 2em;">
                                             @if(!empty($subsection['text_content']))
                                                 <div style="margin-bottom: 0.5em;">
-                                                    <strong>({{ $subsectionNumber }})</strong> {!! makeLinksClickableSimple($subsection['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')') !!}
+                                                    <strong>{{ $subsectionNumber }}</strong> {!! makeLinksClickableSimple($subsection['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')') !!}
                                                 </div>
                                             @endif
                                             @foreach($subsection['paragraphs'] as $paragraphNumber => $paragraph)
                                                 <div style="margin-left: 2em;">
                                                     <div style="margin-bottom: 0.5em;">
-                                                        <strong>({{ $paragraphNumber }})</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')') !!}
+                                                        <strong>{{ $paragraphNumber }}</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')') !!}
                                                     </div>
                                                     @foreach($paragraph['sub_paragraphs'] as $subParagraph)
                                                         <div style="margin-left: 2em;">
                                                             <div style="margin-bottom: 0.5em;">
-                                                                <strong>({{ $subParagraph['sub_paragraph'] }})</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
+                                                                <strong>{{ $subParagraph['sub_paragraph'] }}</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
                                                             </div>
                                                         </div>
                                                     @endforeach
@@ -844,12 +892,12 @@
                                     @foreach($section['paragraphs'] as $paragraphNumber => $paragraph)
                                         <div style="margin-left: 2em;">
                                             <div style="margin-bottom: 0.5em;">
-                                                <strong>({{ $paragraphNumber }})</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraphNumber . ')') !!}
+                                                <strong>{{ $paragraphNumber }}</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraphNumber . ')') !!}
                                             </div>
                                             @foreach($paragraph['sub_paragraphs'] as $subParagraph)
                                                 <div style="margin-left: 2em;">
                                                     <div style="margin-bottom: 0.5em;">
-                                                        <strong>({{ $subParagraph['sub_paragraph'] }})</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraphNumber . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
+                                                        <strong>{{ $subParagraph['sub_paragraph'] }}</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraphNumber . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -868,7 +916,7 @@
                                 <div style="font-size:1.15em; font-weight:bold; margin-bottom:0.5em;">Part {{ $partNumber }}: {{ $part['title'] }}</div>
                                 @if(!empty($part['sections']))
                                     @foreach($part['sections'] as $sectionNumber => $section)
-                                        @if(!empty($section['title']))
+                                        @if(!empty($section['title']) && trim($section['title']) !== '' && $section['title'] !== $part['title'])
                                             <div style="margin-top: 1em; color: #333; font-weight: bold;">{{ $section['title'] }}</div>
                                         @endif
                                         @if(!empty($section['text_content']))
@@ -883,18 +931,18 @@
                                                 @endif
                                                 @if(!empty($subsection['text_content']))
                                                     <div style="margin-bottom: 0.5em;">
-                                                        <strong>({{ $subsectionNumber }})</strong> {!! makeLinksClickableSimple($subsection['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')') !!}
+                                                        <strong>{{ $subsectionNumber }}</strong> {!! makeLinksClickableSimple($subsection['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')') !!}
                                                     </div>
                                                 @endif
                                                 @foreach($subsection['paragraphs'] as $paragraphNumber => $paragraph)
                                                     <div style="margin-left: 2em;">
                                                         <div style="margin-bottom: 0.5em;">
-                                                            <strong>({{ $paragraphNumber }})</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')') !!}
+                                                            <strong>{{ $paragraphNumber }}</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')') !!}
                                                         </div>
                                                         @foreach($paragraph['sub_paragraphs'] as $subParagraph)
                                                             <div style="margin-left: 2em;">
                                                                 <div style="margin-bottom: 0.5em;">
-                                                                    <strong>({{ $subParagraph['sub_paragraph'] }})</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
+                                                                    <strong>{{ $subParagraph['sub_paragraph'] }}</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $subsectionNumber . ')(' . $paragraphNumber . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
                                                                 </div>
                                                             </div>
                                                         @endforeach
@@ -908,12 +956,12 @@
                                         @foreach($section['paragraphs'] as $paragraph)
                                             <div style="margin-left: 2em;">
                                                 <div style="margin-bottom: 0.5em;">
-                                                    <strong>({{ $paragraph['paragraph'] }})</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraph['paragraph'] . ')') !!}
+                                                    <strong>{{ $paragraph['paragraph'] }}</strong> {!! makeLinksClickableSimple($paragraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraph['paragraph'] . ')') !!}
                                                 </div>
                                                 @foreach($paragraph['sub_paragraphs'] as $subParagraph)
                                                     <div style="margin-left: 2em;">
                                                         <div style="margin-bottom: 0.5em;">
-                                                            <strong>({{ $subParagraph['sub_paragraph'] }})</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraph['paragraph'] . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
+                                                            <strong>{{ $subParagraph['sub_paragraph'] }}</strong> {!! makeLinksClickableSimple($subParagraph['text_content'], $legalTable->id, $sectionNumber . '(' . $paragraph['paragraph'] . ')(' . $subParagraph['sub_paragraph'] . ')') !!}
                                                         </div>
                                                     </div>
                                                 @endforeach
@@ -1635,11 +1683,78 @@ $(function() {
         // Add to document
         document.body.appendChild(popup);
         
-        // Make popup draggable
+        // Make popup draggable with enhanced functionality
         $(popup).draggable({
             handle: '.popup-header',
-            containment: 'window',
-            scroll: false
+            containment: false, // allow anywhere
+            scroll: false,
+            start: function(event, ui) {
+                $(this).css({
+                    'opacity': '0.7',
+                    'z-index': 2000
+                });
+                $('.nested-droppable').addClass('highlight-droppable');
+            },
+            drag: function(event, ui) {
+                // Always keep position fixed while dragging
+                $(this).css('position', 'fixed');
+            },
+            stop: function(event, ui) {
+                $(this).css({
+                    'opacity': '1',
+                    'z-index': ''
+                });
+                $('.nested-droppable').removeClass('highlight-droppable');
+                // Always update position to where dropped
+                $(this).css({
+                    position: 'fixed',
+                    top: ui.offset.top - $(window).scrollTop(),
+                    left: ui.offset.left - $(window).scrollLeft()
+                });
+            }
+        });
+
+        // Make nested-droppable accept floating popups
+        $('.nested-droppable').droppable({
+            accept: '.floating-popup',
+            tolerance: 'pointer',
+            classes: {
+                "ui-droppable-hover": "droppable-hover"
+            },
+            drop: function(event, ui) {
+                const droppedPopup = ui.draggable[0];
+                // Mark as dropped on droppable
+                $(ui.helper).data('dropped-on-droppable', true);
+                
+                // Clone for pinning
+                const clonedContent = droppedPopup.cloneNode(true);
+                clonedContent.className = 'pinned-popup card mb-2';
+                clonedContent.style.cssText = '';
+                
+                // Update pin button to remove button
+                const pinBtn = clonedContent.querySelector('.popup-pin-btn');
+                if (pinBtn) {
+                    pinBtn.innerHTML = '<i class="fas fa-trash"></i> Remove';
+                    pinBtn.classList.remove('popup-pin-btn');
+                    pinBtn.classList.add('remove-pinned-btn');
+                    
+                    // Setup remove functionality for the cloned popup
+                    pinBtn.addEventListener('click', () => {
+                        clonedContent.style.animation = 'popupFadeOut 0.3s ease-in forwards';
+                        setTimeout(() => clonedContent.remove(), 300);
+                    });
+                }
+                
+                // Remove close button
+                clonedContent.querySelector('.popup-close-btn')?.remove();
+                
+                // Add to droppable area
+                this.insertBefore(clonedContent, this.firstChild);
+                
+                // Remove the original floating popup with animation
+                droppedPopup.style.animation = 'popupFadeOut 0.2s ease-in forwards';
+                setTimeout(() => droppedPopup.remove(), 200);
+            }
         });
         
         // Close button functionality
@@ -1684,11 +1799,12 @@ $(function() {
         // Add fade-out animation CSS if not exists
         if (!document.querySelector('#popup-animations')) {
             const style = document.createElement('style');
+           
             style.id = 'popup-animations';
             style.textContent = `
                 @keyframes popupFadeOut {
                     from {
-                        opacity: 1;
+                        opacity:  1;
                         transform: translateY(0) scale(1);
                     }
                     to {
@@ -1755,7 +1871,8 @@ $(function() {
                                     if (section.section !== null && section.section !== undefined) html += `<div><i class="fas fa-file-text"></i> Section: ${section.section}</div>`;
                                     if (section.sub_section) html += `<div><i class="fas fa-indent"></i> Subsection: ${section.sub_section}</div>`;
                                     if (section.paragraph) html += `<div><i class="fas fa-paragraph"></i> Paragraph: ${section.paragraph}</div>`;
-                                    html += `</div></div>`;
+                                    html += `</div>`;
+                                    html += `</div>`;
                                 });
                                 
                                 popup.querySelector('.popup-content').innerHTML = html;
