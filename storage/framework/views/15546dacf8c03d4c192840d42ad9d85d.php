@@ -8,17 +8,17 @@
   <meta name="description" content="Mantis is made using Bootstrap 5 design framework.">
   <meta name="keywords" content="Mantis, Dashboard, Admin Template">
   <meta name="author" content="CodedThemes">
-  <link rel="icon" href="{{ asset('admin_assets/images/favicon.svg') }}" type="image/x-icon">
+  <link rel="icon" href="<?php echo e(asset('admin_assets/images/favicon.svg')); ?>" type="image/x-icon">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
-  <link rel="stylesheet" href="{{ asset('admin_assets/fonts/tabler-icons.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin_assets/fonts/feather.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin_assets/fonts/fontawesome.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin_assets/fonts/material.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin_assets/css/style.css') }}" id="main-style-link">
-  <link rel="stylesheet" href="{{ asset('admin_assets/css/style-preset.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin/texteditor/assets/css/form_styles.css') }}">
+  <link rel="stylesheet" href="<?php echo e(asset('admin_assets/fonts/tabler-icons.min.css')); ?>">
+  <link rel="stylesheet" href="<?php echo e(asset('admin_assets/fonts/feather.css')); ?>">
+  <link rel="stylesheet" href="<?php echo e(asset('admin_assets/fonts/fontawesome.css')); ?>">
+  <link rel="stylesheet" href="<?php echo e(asset('admin_assets/fonts/material.css')); ?>">
+  <link rel="stylesheet" href="<?php echo e(asset('admin_assets/css/style.css')); ?>" id="main-style-link">
+  <link rel="stylesheet" href="<?php echo e(asset('admin_assets/css/style-preset.css')); ?>">
+  <link rel="stylesheet" href="<?php echo e(asset('admin/texteditor/assets/css/form_styles.css')); ?>">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="{{ asset('tinymce/tinymce.min.js') }}"></script>
+  <script src="<?php echo e(asset('tinymce/tinymce.min.js')); ?>"></script>
     <!-- Custom Pagination Styles -->
   <style>
     .pagination {
@@ -153,7 +153,7 @@
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="{{ url('/admin-dashboard') }}" class="b-brand text-primary">
+      <a href="<?php echo e(url('/admin-dashboard')); ?>" class="b-brand text-primary">
         <img src="admin_assets/images/jurislocator-logo.png" 
              
              alt="Jurislocator Logo" style="width: 50px">
@@ -162,7 +162,7 @@
     <div class="navbar-content">
       <ul class="pc-navbar">        
         <li class="pc-item">
-          <a href="{{ route('admin.dashboard') }}" class="pc-link">
+          <a href="<?php echo e(route('admin.dashboard')); ?>" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
             <span class="pc-mtext">Dashboard</span>
           </a>
@@ -186,23 +186,23 @@
         <li class="pc-item pc-hasmenu">
           <a href="#" class="pc-link"><span class="pc-micon"><i class="ti ti-link"></i></span><span class="pc-mtext">Resource pages</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
           <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="{{ route('admin.government-links.index') }}"><i class="ti ti-building-bank me-2"></i>Government Links</a></li>
-            <li class="pc-item"><a class="pc-link" href="{{ route('admin.rcic-deadlines.index') }}"><i class="ti ti-calendar-event me-2"></i>RCIC Deadlines</a></li>
-            <li class="pc-item"><a class="pc-link" href="{{ route('admin.legal-key-terms.index') }}"><i class="ti ti-vocabulary me-2"></i>Legal key terms</a></li>
+            <li class="pc-item"><a class="pc-link" href="<?php echo e(route('admin.government-links.index')); ?>"><i class="ti ti-building-bank me-2"></i>Government Links</a></li>
+            <li class="pc-item"><a class="pc-link" href="<?php echo e(route('admin.rcic-deadlines.index')); ?>"><i class="ti ti-calendar-event me-2"></i>RCIC Deadlines</a></li>
+            <li class="pc-item"><a class="pc-link" href="<?php echo e(route('admin.legal-key-terms.index')); ?>"><i class="ti ti-vocabulary me-2"></i>Legal key terms</a></li>
           </ul>
         </li>
         <li class="pc-item pc-hasmenu">
           <a href="#" class="pc-link"><span class="pc-micon"><i class="ti ti-report"></i></span><span class="pc-mtext">All Reports</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>          <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="{{ route('admin.payments.index') }}"><i class="ti ti-receipt me-2"></i>Payment Dashboard</a></li>
-            <li class="pc-item"><a class="pc-link" href="{{ route('admin.reports.users') }}"><i class="ti ti-user-search me-2"></i>Users Report</a></li>
+            <li class="pc-item"><a class="pc-link" href="<?php echo e(route('admin.payments.index')); ?>"><i class="ti ti-receipt me-2"></i>Payment Dashboard</a></li>
+            <li class="pc-item"><a class="pc-link" href="<?php echo e(route('admin.reports.users')); ?>"><i class="ti ti-user-search me-2"></i>Users Report</a></li>
           </ul>
         </li>
         <li class="pc-item">
-          <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();" class="pc-link">
+          <a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();" class="pc-link">
             <span class="pc-micon"><i class="ti ti-logout"></i></span>
             <span class="pc-mtext">Logout</span>
           </a>
-          <form id="sidebar-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
+          <form id="sidebar-logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;"><?php echo csrf_field(); ?></form>
         </li>
       </ul>
     </div>
@@ -227,7 +227,7 @@
               <i class="ti ti-user fs-5"></i>
             </div>
             <div class="admin-info">
-              <span class="admin-name fw-semibold text-dark d-block" style="font-size: 0.95rem; line-height: 1.2;">{{ Auth::user()->name ?? 'Admin' }}</span>
+              <span class="admin-name fw-semibold text-dark d-block" style="font-size: 0.95rem; line-height: 1.2;"><?php echo e(Auth::user()->name ?? 'Admin'); ?></span>
               <small class="admin-role text-muted" style="font-size: 0.75rem;">Administrator</small>
             </div>
           </div>
@@ -238,7 +238,7 @@
 </header>
 <div class="pc-container">
     <div class="pc-content">
-        @yield('admin-content')
+        <?php echo $__env->yieldContent('admin-content'); ?>
     </div>
 </div>
 <!-- [ Main Content ] end -->
@@ -253,14 +253,14 @@
 </footer>
 
 <!-- Required Js -->
-<script src="{{ asset('admin_assets/js/plugins/popper.min.js') }}"></script>
-<script src="{{ asset('admin_assets/js/plugins/simplebar.min.js') }}"></script>
-<script src="{{ asset('admin_assets/js/plugins/bootstrap.min.js') }}"></script>
-<script src="{{ asset('admin_assets/js/fonts/custom-font.js') }}"></script>
-<script src="{{ asset('admin_assets/js/pcoded.js') }}"></script>
-<script src="{{ asset('admin_assets/js/plugins/feather.min.js') }}"></script>
+<script src="<?php echo e(asset('admin_assets/js/plugins/popper.min.js')); ?>"></script>
+<script src="<?php echo e(asset('admin_assets/js/plugins/simplebar.min.js')); ?>"></script>
+<script src="<?php echo e(asset('admin_assets/js/plugins/bootstrap.min.js')); ?>"></script>
+<script src="<?php echo e(asset('admin_assets/js/fonts/custom-font.js')); ?>"></script>
+<script src="<?php echo e(asset('admin_assets/js/pcoded.js')); ?>"></script>
+<script src="<?php echo e(asset('admin_assets/js/plugins/feather.min.js')); ?>"></script>
 
-@stack('scripts')
+<?php echo $__env->yieldPushContent('scripts'); ?>
 
 <script>layout_change('light');</script>
 <script>change_box_container('false');</script>
@@ -269,3 +269,4 @@
 <script>font_change("Public-Sans");</script>
 </body>
 </html>
+<?php /**PATH C:\Users\User\Desktop\New folder (5)\jfinl\resources\views/layouts/admin.blade.php ENDPATH**/ ?>
